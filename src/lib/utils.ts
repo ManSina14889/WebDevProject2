@@ -1,5 +1,5 @@
 // Utility functions for handling base path
-const BASE_PATH = '/app/karaoke-management';
+const BASE_PATH = '/app/WebDevProject2';
 
 export const getApiUrl = (path: string) => {
   return `${BASE_PATH}${path}`;
