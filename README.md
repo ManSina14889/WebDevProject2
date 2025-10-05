@@ -90,6 +90,22 @@ karaoke-management/
 - `/api/bookings/*` - Booking management
 - `/api/init-rooms` - Database initialization
 
+- ### Data Models
+- ###Rooms: Manage karaoke rooms
+- Manage karaoke rooms Key fields: id, roomNumber, capacity, status ('available' | 'maintenance')
+- CRUD: Create room, list/get rooms, update room (number/capacity/status), delete room
+-    
+- ###Users(customer/admin):
+- Key fields: id, name, email, phone, role ('user' | 'admin'), password (hashed)
+- CRUD: Register/create user, list/get users, update profile, delete account
+
+- - ###Bookings: Manage room reservations
+- Key fields: id, roomId, customerId, date, startTime, endTime, status ('booked' | 'completed' | 'cancelled')
+- CRUD: Create booking, list/get bookings (with filters), update status/times, delete booking
+
+- we did say our Data Models were gonna be User/Admins/Booking before however user and admin kinda fall under the same category
+- If ajarn is okay with the previous Data Models then we go with that but if not then we can use the given Data Model :) :)
+
 ### Contributing
 This project was developed as part of a web development course assignment. The system demonstrates full-stack development capabilities with modern web technologies.
 
