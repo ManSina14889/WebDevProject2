@@ -44,12 +44,10 @@ export async function POST(request: NextRequest) {
     };
     
     return NextResponse.json(userResponse, { status: 201 });
-  } catch (error: unknown) {
-    console.error('Error registering user:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to register user' },
-      { status: 400 }
-    );
+  } catch (err: unknown) {
+    console.error('Error registering user:', err);
+    // FIX: Type-safe error narrowing (avoid `error.message` on `unknown`)
+    const message = err instanceof Error ? err.message : 'Failed to register user';
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }
-

@@ -26,12 +26,10 @@ export async function GET() {
     }
     
     return NextResponse.json(rooms);
-  } catch (error) {
-    console.error('Error fetching rooms:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch rooms' },
-      { status: 500 }
-    );
+  } catch (err: unknown) { // FIX: type to unknown
+    console.error('Error fetching rooms:', err);
+    const message = err instanceof Error ? err.message : 'Failed to fetch rooms'; // FIX: narrow
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -45,11 +43,9 @@ export async function POST(request: NextRequest) {
     await room.save();
     
     return NextResponse.json(room, { status: 201 });
-  } catch (error: unknown) {
-    console.error('Error creating room:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create room' },
-      { status: 400 }
-    );
+  } catch (err: unknown) { // FIX: keep unknown + narrow
+    console.error('Error creating room:', err);
+    const message = err instanceof Error ? err.message : 'Failed to create room'; // FIX: narrow
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

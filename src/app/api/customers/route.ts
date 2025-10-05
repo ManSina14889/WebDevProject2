@@ -11,12 +11,10 @@ export async function GET() {
       .sort({ createdAt: -1 });
     
     return NextResponse.json(customers);
-  } catch (error) {
-    console.error('Error fetching customers:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch customers' },
-      { status: 500 }
-    );
+  } catch (err: unknown) {                     // FIX: type to unknown
+    console.error('Error fetching customers:', err);
+    const message = err instanceof Error ? err.message : 'Failed to fetch customers'; // FIX: narrow
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -33,12 +31,9 @@ export async function POST(request: NextRequest) {
     await customer.save();
     
     return NextResponse.json(customer, { status: 201 });
-  } catch (error: unknown) {
-    console.error('Error creating customer:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create customer' },
-      { status: 400 }
-    );
+  } catch (err: unknown) {                     // FIX: keep as unknown
+    console.error('Error creating customer:', err);
+    const message = err instanceof Error ? err.message : 'Failed to create customer'; // FIX: narrow
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }
-
