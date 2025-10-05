@@ -65,7 +65,7 @@ export default function LoginPage() {
         <div className="flex justify-center">
           <div className="flex items-center space-x-2">
             <Mic className="h-12 w-12 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Karaoke Manager</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Welcome to Karaoke Time</h1>
           </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">

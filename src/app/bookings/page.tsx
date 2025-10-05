@@ -112,8 +112,8 @@ export default function BookingsPage() {
   const handleEdit = (booking: IBooking) => {
     setEditingBooking(booking);
     setFormData({
-      roomId: booking.roomId._id || booking.roomId.toString(),
-      customerId: booking.customerId._id || booking.customerId.toString(),
+      roomId: booking.roomId?._id || booking.roomId?.toString() || '',
+      customerId: booking.customerId?._id || booking.customerId?.toString() || '',
       date: new Date(booking.date).toISOString().split('T')[0],
       startTime: booking.startTime,
       endTime: booking.endTime,
@@ -156,12 +156,12 @@ export default function BookingsPage() {
   };
 
   const getRoomName = (roomId: {_id: string, roomNumber: string} | string) => {
-    const room = rooms.find(r => r._id === (roomId._id || roomId));
+    const room = rooms.find(r => r._id === (roomId?._id || roomId));
     return room ? room.roomNumber : 'Unknown Room';
   };
 
   const getCustomerName = (customerId: {_id: string, name: string} | string) => {
-    const customer = customers.find(c => c._id === (customerId._id || customerId));
+    const customer = customers.find(c => c._id === (customerId?._id || customerId));
     return customer ? customer.name : 'Unknown Customer';
   };
 

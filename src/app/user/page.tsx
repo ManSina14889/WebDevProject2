@@ -139,7 +139,7 @@ export default function UserDashboard() {
 
   const getBookedTimeSlots = () => {
     const roomBookings = dateBookings.filter(booking => 
-      (booking.roomId._id === selectedRoom?._id || booking.roomId === selectedRoom?._id) &&
+      (booking.roomId?._id === selectedRoom?._id || booking.roomId === selectedRoom?._id) &&
       booking.status === 'booked'
     );
     

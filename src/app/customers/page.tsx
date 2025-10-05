@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
 import Layout from '@/components/Layout';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
@@ -140,10 +139,6 @@ export default function CustomersPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Customers Management</h1>
-          <Button onClick={() => setIsModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Customer
-          </Button>
         </div>
 
         <div className="bg-white shadow rounded-lg">

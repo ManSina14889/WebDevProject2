@@ -127,8 +127,8 @@ export default function RoomsPage() {
       render: (room: IRoom) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
           room.status === 'available' 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-red-100 text-red-800'
+            ? 'bg-gray-100 text-black' 
+            : 'bg-gray-100 text-black'
         }`}>
           {room.status}
         </span>

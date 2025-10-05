@@ -135,8 +135,14 @@ export default function AdminDashboard() {
           return;
         }
 
-        // Refresh data
-        await fetchData();
+        // Update only the specific booking in state
+        setBookings(prevBookings => 
+          prevBookings.map(booking => 
+            booking._id === bookingId 
+              ? { ...booking, status: 'cancelled' }
+              : booking
+          )
+        );
       } catch (error) {
         console.error('Error cancelling booking:', error);
         alert('Failed to cancel booking');
@@ -161,8 +167,14 @@ export default function AdminDashboard() {
         return;
       }
 
-      // Refresh data
-      await fetchData();
+      // Update only the specific booking in state
+      setBookings(prevBookings => 
+        prevBookings.map(booking => 
+          booking._id === bookingId 
+            ? { ...booking, status: 'completed' }
+            : booking
+        )
+      );
     } catch (error) {
       console.error('Error completing booking:', error);
       alert('Failed to complete booking');
@@ -320,13 +332,13 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">
-                            {booking.customerId.name} - {booking.roomId.roomNumber}
+                            {booking.customerId?.name || 'Unknown Customer'} - {booking.roomId?.roomNumber || 'Unknown Room'}
                           </p>
                           <p className="text-sm text-gray-500">
                             {booking.startTime} - {booking.endTime}
                           </p>
                           <p className="text-xs text-gray-400">
-                            {booking.customerId.phone} • {booking.customerId.email}
+                            {booking.customerId?.phone || 'N/A'} • {booking.customerId?.email || 'N/A'}
                           </p>
                         </div>
                       </div>
