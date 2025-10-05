@@ -90,11 +90,11 @@ karaoke-management/
 - `/api/bookings/*` - Booking management
 - `/api/init-rooms` - Database initialization
 
-- ### Data Models
+### Data Models
 - ###Rooms: Manage karaoke rooms
 - Manage karaoke rooms Key fields: id, roomNumber, capacity, status ('available' | 'maintenance')
 - CRUD: Create room, list/get rooms, update room (number/capacity/status), delete room
--    
+    
 - ###Users(customer/admin):
 - Key fields: id, name, email, phone, role ('user' | 'admin'), password (hashed)
 - CRUD: Register/create user, list/get users, update profile, delete account
