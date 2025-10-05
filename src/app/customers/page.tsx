@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Layout from '@/components/Layout';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import Table from '@/components/ui/Table';
 import { ICustomer } from '@/models/Customer';
+import { getApiUrl } from '@/lib/utils';
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<ICustomer[]>([]);
@@ -27,11 +28,13 @@ export default function CustomersPage() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch('/api/customers');
+      const response = await fetch(getApiUrl('/api/customers'));
       const data = await response.json();
       setCustomers(data);
     } catch (error) {
       console.error('Error fetching customers:', error);
+      // Set empty array if API fails
+      setCustomers([]);
     } finally {
       setLoading(false);
     }
@@ -42,7 +45,7 @@ export default function CustomersPage() {
     setErrors({});
 
     try {
-      const url = editingCustomer ? `/api/customers/${editingCustomer._id}` : '/api/customers';
+      const url = editingCustomer ? getApiUrl(`/api/customers/${editingCustomer._id}`) : getApiUrl('/api/customers');
       const method = editingCustomer ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -81,7 +84,7 @@ export default function CustomersPage() {
     if (!confirm('Are you sure you want to delete this customer?')) return;
 
     try {
-      const response = await fetch(`/api/customers/${customer._id}`, {
+      const response = await fetch(getApiUrl(`/api/customers/${customer._id}`), {
         method: 'DELETE',
       });
 
@@ -203,4 +206,3 @@ export default function CustomersPage() {
     </Layout>
   );
 }
-

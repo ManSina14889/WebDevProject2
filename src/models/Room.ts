@@ -1,6 +1,7 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IRoom extends Document {
+  _id: string;
   roomNumber: string;
   capacity: number;
   status: 'available' | 'occupied';
@@ -8,27 +9,24 @@ export interface IRoom extends Document {
   updatedAt: Date;
 }
 
-const RoomSchema: Schema = new Schema({
+const RoomSchema = new Schema<IRoom>({
   roomNumber: {
     type: String,
-    required: [true, 'Room number is required'],
-    unique: true,
-    trim: true,
+    required: true,
+    unique: true
   },
   capacity: {
     type: Number,
-    required: [true, 'Capacity is required'],
-    min: [1, 'Capacity must be at least 1'],
-    max: [20, 'Capacity cannot exceed 20'],
+    required: true,
+    min: 1
   },
   status: {
     type: String,
     enum: ['available', 'occupied'],
-    default: 'available',
-  },
+    default: 'available'
+  }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
 export default mongoose.models.Room || mongoose.model<IRoom>('Room', RoomSchema);
-

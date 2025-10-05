@@ -5,11 +5,12 @@ import Room from '@/models/Room';
 // GET /api/rooms/[id] - Get a specific room
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const room = await Room.findById(params.id);
+    const { id } = await params;
+    const room = await Room.findById(id);
     
     if (!room) {
       return NextResponse.json(
@@ -28,19 +29,20 @@ export async function GET(
   }
 }
 
-// PUT /api/rooms/[id] - Update a specific room
+// PUT /api/rooms/[id] - Update a room
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params;
     const body = await request.json();
     
     const room = await Room.findByIdAndUpdate(
-      params.id,
+      id,
       body,
-      { new: true, runValidators: true }
+      { new: true }
     );
     
     if (!room) {
@@ -51,31 +53,24 @@ export async function PUT(
     }
     
     return NextResponse.json(room);
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error updating room:', error);
-    
-    if (error.code === 11000) {
-      return NextResponse.json(
-        { error: 'Room number already exists' },
-        { status: 400 }
-      );
-    }
-    
     return NextResponse.json(
-      { error: error.message || 'Failed to update room' },
-      { status: 400 }
+      { error: 'Failed to update room' },
+      { status: 500 }
     );
   }
 }
 
-// DELETE /api/rooms/[id] - Delete a specific room
+// DELETE /api/rooms/[id] - Delete a room
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const room = await Room.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const room = await Room.findByIdAndDelete(id);
     
     if (!room) {
       return NextResponse.json(

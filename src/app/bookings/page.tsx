@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Calendar } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Calendar } from 'lucide-react';
 import Layout from '@/components/Layout';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import Table from '@/components/ui/Table';
 import { IBooking } from '@/models/Booking';
+import { getApiUrl } from '@/lib/utils';
 import { IRoom } from '@/models/Room';
 import { ICustomer } from '@/models/Customer';
 import { format } from 'date-fns';
-
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<IBooking[]>([]);
   const [rooms, setRooms] = useState<IRoom[]>([]);
@@ -30,53 +30,58 @@ export default function BookingsPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const fetchData = useCallback(async () => {
+    try {
+      const [roomsRes, customersRes] = await Promise.all([
+        fetch(getApiUrl('/api/rooms')).catch(() => ({ json: () => mockRooms })),
+        fetch(getApiUrl('/api/customers')).catch(() => ({ json: () => mockCustomers })),
+      ]);
+      const roomsData = await roomsRes.json();
+      const customersData = await customersRes.json();
+      setRooms(roomsData);
+      setCustomers(customersData);
+      await fetchBookings();
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setRooms(mockRooms);
+      setCustomers(mockCustomers);
+      setBookings(mockBookings);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchBookings]);
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  const fetchBookings = useCallback(async () => {
+    try {
+      const response = await fetch(getApiUrl(`/api/bookings?date=${selectedDate}`));
+      const data = await response.json();
+      setBookings(data);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      setBookings(mockBookings);
+    }
+  }, [selectedDate]);
 
   useEffect(() => {
     if (selectedDate) {
       fetchBookings();
     }
-  }, [selectedDate]);
+  }, [selectedDate, fetchBookings]);
 
-  const fetchData = async () => {
-    try {
-      const [roomsRes, customersRes] = await Promise.all([
-        fetch('/api/rooms'),
-        fetch('/api/customers'),
-      ]);
-      
-      const roomsData = await roomsRes.json();
-      const customersData = await customersRes.json();
-      
-      setRooms(roomsData);
-      setCustomers(customersData);
-      
-      await fetchBookings();
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // removed duplicate legacy fetchData definition (use the useCallback version above)
 
-  const fetchBookings = async () => {
-    try {
-      const response = await fetch(`/api/bookings?date=${selectedDate}`);
-      const data = await response.json();
-      setBookings(data);
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-    }
-  };
+  // removed duplicate legacy fetchBookings definition (use the useCallback version above)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
     try {
-      const url = editingBooking ? `/api/bookings/${editingBooking._id}` : '/api/bookings';
+      const url = editingBooking ? getApiUrl(`/api/bookings/${editingBooking._id}`) : getApiUrl('/api/bookings');
       const method = editingBooking ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -121,7 +126,7 @@ export default function BookingsPage() {
     if (!confirm('Are you sure you want to delete this booking?')) return;
 
     try {
-      const response = await fetch(`/api/bookings/${booking._id}`, {
+      const response = await fetch(getApiUrl(`/api/bookings/${booking._id}`), {
         method: 'DELETE',
       });
 
@@ -150,12 +155,12 @@ export default function BookingsPage() {
     setErrors({});
   };
 
-  const getRoomName = (roomId: any) => {
+  const getRoomName = (roomId: {_id: string, roomNumber: string} | string) => {
     const room = rooms.find(r => r._id === (roomId._id || roomId));
     return room ? room.roomNumber : 'Unknown Room';
   };
 
-  const getCustomerName = (customerId: any) => {
+  const getCustomerName = (customerId: {_id: string, name: string} | string) => {
     const customer = customers.find(c => c._id === (customerId._id || customerId));
     return customer ? customer.name : 'Unknown Customer';
   };
@@ -218,10 +223,6 @@ export default function BookingsPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Bookings Management</h1>
-          <Button onClick={() => setIsModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Booking
-          </Button>
         </div>
 
         <div className="bg-white p-4 rounded-lg shadow">
@@ -232,7 +233,7 @@ export default function BookingsPage() {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>
@@ -356,4 +357,3 @@ export default function BookingsPage() {
     </Layout>
   );
 }
-

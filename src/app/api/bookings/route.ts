@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const date = searchParams.get('date');
     const roomId = searchParams.get('roomId');
     
-    let query: any = {};
+    const query: Record<string, unknown> = {};
     
     if (date) {
       const startOfDay = new Date(date);
@@ -48,6 +48,10 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const body = await request.json();
     
+    console.log('Received booking data:', body);
+    console.log('customerId type:', typeof body.customerId);
+    console.log('customerId value:', body.customerId);
+    
     // Check for overlapping bookings
     const overlappingBooking = await Booking.findOne({
       roomId: body.roomId,
@@ -76,12 +80,11 @@ export async function POST(request: NextRequest) {
     await booking.populate('customerId', 'name phone email');
     
     return NextResponse.json(booking, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating booking:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create booking' },
+      { error: error instanceof Error ? error.message : 'Failed to create booking' },
       { status: 400 }
     );
   }
 }
-

@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Layout from '@/components/Layout';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import Table from '@/components/ui/Table';
 import { IRoom } from '@/models/Room';
-
+import { getApiUrl } from '@/lib/utils';
 export default function RoomsPage() {
   const [rooms, setRooms] = useState<IRoom[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,11 +27,13 @@ export default function RoomsPage() {
 
   const fetchRooms = async () => {
     try {
-      const response = await fetch('/api/rooms');
+      const response = await fetch(getApiUrl('/api/rooms'));
       const data = await response.json();
       setRooms(data);
     } catch (error) {
       console.error('Error fetching rooms:', error);
+      // Set empty array if API fails
+      setRooms([]);
     } finally {
       setLoading(false);
     }
@@ -42,7 +44,7 @@ export default function RoomsPage() {
     setErrors({});
 
     try {
-      const url = editingRoom ? `/api/rooms/${editingRoom._id}` : '/api/rooms';
+      const url = editingRoom ? getApiUrl(`/api/rooms/${editingRoom._id}`) : getApiUrl('/api/rooms');
       const method = editingRoom ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -84,7 +86,7 @@ export default function RoomsPage() {
     if (!confirm('Are you sure you want to delete this room?')) return;
 
     try {
-      const response = await fetch(`/api/rooms/${room._id}`, {
+      const response = await fetch(getApiUrl(`/api/rooms/${room._id}`), {
         method: 'DELETE',
       });
 
@@ -178,7 +180,7 @@ export default function RoomsPage() {
             <Input
               label="Room Number"
               value={formData.roomNumber}
-              onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, roomNumber: e.target.value })}
               error={errors.roomNumber}
               required
             />
@@ -189,7 +191,7 @@ export default function RoomsPage() {
               min="1"
               max="20"
               value={formData.capacity}
-              onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, capacity: e.target.value })}
               error={errors.capacity}
               required
             />
@@ -222,4 +224,3 @@ export default function RoomsPage() {
     </Layout>
   );
 }
-
