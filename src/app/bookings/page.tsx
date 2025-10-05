@@ -30,6 +30,17 @@ export default function BookingsPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const fetchBookings = useCallback(async () => {
+    try {
+      const response = await fetch(getApiUrl(`/api/bookings?date=${selectedDate}`));
+      const data = await response.json();
+      setBookings(data);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      setBookings(mockBookings);
+    }
+  }, [selectedDate]);
+
   const fetchData = useCallback(async () => {
     try {
       const [roomsRes, customersRes] = await Promise.all([
@@ -54,17 +65,6 @@ export default function BookingsPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const fetchBookings = useCallback(async () => {
-    try {
-      const response = await fetch(getApiUrl(`/api/bookings?date=${selectedDate}`));
-      const data = await response.json();
-      setBookings(data);
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-      setBookings(mockBookings);
-    }
-  }, [selectedDate]);
 
   useEffect(() => {
     if (selectedDate) {
