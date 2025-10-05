@@ -6,12 +6,7 @@ To connect your Karaoke Management System to MongoDB Atlas, you need to create a
 
 ### **Step 1: Create Environment File**
 
-Create a file named `.env.local` in the root directory of your project (`karaoke-management/.env.local`) with the following content:
-
-```env
-# MongoDB Connection String
-MONGODB_URI=mongodb+srv://sumantimsina402_db_user:suman6235220@cluster1.yzovyvg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1
-```
+Create a file named `.env.local` in the root directory of your project :
 
 ### **Step 2: File Structure**
 
