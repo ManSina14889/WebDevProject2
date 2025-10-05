@@ -4,7 +4,7 @@ export interface IRoom extends Document {
   _id: string;
   roomNumber: string;
   capacity: number;
-  status: 'available' | 'occupied';
+  status: 'available' | 'maintenance';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,7 +22,7 @@ const RoomSchema = new Schema<IRoom>({
   },
   status: {
     type: String,
-    enum: ['available', 'occupied'],
+    enum: ['available', 'maintenance'],
     default: 'available'
   }
 }, {

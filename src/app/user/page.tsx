@@ -107,7 +107,7 @@ export default function UserDashboard() {
   };
 
   const getAvailableRooms = () => {
-    return rooms; // Show all rooms, availability will be handled in time slots
+    return rooms.filter(room => room.status === 'available'); // Only show available rooms, exclude maintenance
   };
 
   const getUserBookings = () => {

@@ -17,7 +17,7 @@ export default function RoomsPage() {
   const [formData, setFormData] = useState({
     roomNumber: '',
     capacity: '',
-    status: 'available' as 'available' | 'occupied',
+    status: 'available' as 'available' | 'maintenance',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -127,7 +127,9 @@ export default function RoomsPage() {
       render: (room: IRoom) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
           room.status === 'available' 
-            ? 'bg-gray-100 text-black' 
+            ? 'bg-green-100 text-black' 
+            : room.status === 'maintenance'
+            ? 'bg-yellow-100 text-black'
             : 'bg-gray-100 text-black'
         }`}>
           {room.status}
@@ -202,11 +204,11 @@ export default function RoomsPage() {
               </label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as 'available' | 'occupied' })}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as 'available' | 'maintenance' })}
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="available">Available</option>
-                <option value="occupied">Occupied</option>
+                <option value="maintenance">Maintenance</option>
               </select>
             </div>
             
