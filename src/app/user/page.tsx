@@ -269,6 +269,25 @@ export default function UserDashboard() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    if (!confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) return;
+    try {
+      const response = await fetch(getApiUrl(`/api/customers/${user._id}`), {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        alert('Failed to delete account');
+        return;
+      }
+      logout();
+      router.push(getRouterUrl('/login'));
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      alert('Failed to delete account');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -294,6 +313,10 @@ export default function UserDashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Welcome, {user.name}</span>
+              <Button variant="danger" onClick={handleDeleteAccount}>
+                <X className="h-4 w-4 mr-2" />
+                Delete Account
+              </Button>
               <Button variant="outline" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
