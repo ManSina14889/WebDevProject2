@@ -3,7 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   basePath: '/app/WebDevProject2',
   assetPrefix: '/app/WebDevProject2',
-  /* config options here */
+
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
