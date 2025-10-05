@@ -37,26 +37,26 @@ export default function BookingsPage() {
       setBookings(data);
     } catch (error) {
       console.error('Error fetching bookings:', error);
-      setBookings(mockBookings);
+      setBookings([]);
     }
   }, [selectedDate]);
 
   const fetchData = useCallback(async () => {
     try {
       const [roomsRes, customersRes] = await Promise.all([
-        fetch(getApiUrl('/api/rooms')).catch(() => ({ json: () => mockRooms })),
-        fetch(getApiUrl('/api/customers')).catch(() => ({ json: () => mockCustomers })),
+        fetch(getApiUrl('/api/rooms')),
+        fetch(getApiUrl('/api/customers')),
       ]);
       const roomsData = await roomsRes.json();
       const customersData = await customersRes.json();
-      setRooms(roomsData);
-      setCustomers(customersData);
+      setRooms(Array.isArray(roomsData) ? roomsData : []);
+      setCustomers(Array.isArray(customersData) ? customersData : []);
       await fetchBookings();
     } catch (error) {
       console.error('Error fetching data:', error);
-      setRooms(mockRooms);
-      setCustomers(mockCustomers);
-      setBookings(mockBookings);
+      setRooms([]);
+      setCustomers([]);
+      setBookings([]);
     } finally {
       setLoading(false);
     }
