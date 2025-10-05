@@ -144,7 +144,7 @@ export default function BookingsPage() {
   };
 
   const handleDelete = async (booking: BookingUI) => {
-    if (!confirm('Are you sure you want to delete this booking?')) return;
+    if (!confirm('Are you absolutely sure you want to delete this booking?')) return;
 
     try {
       const response = await fetch(getApiUrl(`/api/bookings/${booking._id}`), {
