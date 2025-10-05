@@ -3,7 +3,7 @@
 ## Team Members
 - [Anuson Khwansakun 6610789](https://github.com/ManSina14889)
 - [Tihong Chhiv 6632088](https://github.com/TihongChhiv)
-- Amru Al-Wafai 6630048 
+- [Amru Al-Wafai 6630048](https://github.com/Amro-41) 
 
 
 ## Project Description
