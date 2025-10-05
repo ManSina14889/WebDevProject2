@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
+import mongoose from 'mongoose';
 
 // GET /api/bookings - Get all bookings
 export async function GET(request: NextRequest) {
@@ -24,7 +25,14 @@ export async function GET(request: NextRequest) {
     }
     
     if (roomId) {
-      query.roomId = roomId;
+      try {
+        query.roomId = new mongoose.Types.ObjectId(roomId);
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid roomId' },
+          { status: 400 }
+        );
+      }
     }
     
     const bookings = await Booking.find(query)
@@ -72,7 +80,14 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const booking = new Booking(body);
+    const booking = new Booking({
+      roomId: new mongoose.Types.ObjectId(body.roomId),
+      customerId: new mongoose.Types.ObjectId(body.customerId),
+      date: new Date(body.date),
+      startTime: body.startTime,
+      endTime: body.endTime,
+      status: body.status ?? 'booked',
+    });
     await booking.save();
     
     // Populate the booking with room and customer details

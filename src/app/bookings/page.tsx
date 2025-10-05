@@ -7,17 +7,38 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import Table from '@/components/ui/Table';
-import { IBooking } from '@/models/Booking';
+// Use a frontend-safe Booking type allowing string or populated refs
+type BookingRef<T> = string | { _id: string } | T;
+interface BookingUI {
+  _id: string;
+  roomId: BookingRef<IRoom>;
+  customerId: BookingRef<ICustomer>;
+  date: string | Date;
+  startTime: string;
+  endTime: string;
+  status: 'booked' | 'completed' | 'cancelled';
+}
+
+// Safely resolve an ID from either a string or a populated object
+const resolveId = (ref: unknown): string => {
+  if (!ref) return '';
+  if (typeof ref === 'string') return ref;
+  if (typeof ref === 'object' && ref !== null && '_id' in (ref as Record<string, unknown>)) {
+    const maybeId = (ref as Record<string, unknown>)['_id'];
+    return typeof maybeId === 'string' ? maybeId : '';
+  }
+  return '';
+};
 import { getApiUrl } from '@/lib/utils';
 import { IRoom } from '@/models/Room';
 import { ICustomer } from '@/models/Customer';
 import { format } from 'date-fns';
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState<IBooking[]>([]);
+  const [bookings, setBookings] = useState<BookingUI[]>([]);
   const [rooms, setRooms] = useState<IRoom[]>([]);
   const [customers, setCustomers] = useState<ICustomer[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBooking, setEditingBooking] = useState<IBooking | null>(null);
+  const [editingBooking, setEditingBooking] = useState<BookingUI | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [formData, setFormData] = useState({
@@ -109,11 +130,11 @@ export default function BookingsPage() {
     }
   };
 
-  const handleEdit = (booking: IBooking) => {
+  const handleEdit = (booking: BookingUI) => {
     setEditingBooking(booking);
     setFormData({
-      roomId: booking.roomId?._id || booking.roomId?.toString() || '',
-      customerId: booking.customerId?._id || booking.customerId?.toString() || '',
+      roomId: resolveId(booking.roomId as unknown),
+      customerId: resolveId(booking.customerId as unknown),
       date: new Date(booking.date).toISOString().split('T')[0],
       startTime: booking.startTime,
       endTime: booking.endTime,
@@ -122,7 +143,7 @@ export default function BookingsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (booking: IBooking) => {
+  const handleDelete = async (booking: BookingUI) => {
     if (!confirm('Are you sure you want to delete this booking?')) return;
 
     try {
@@ -155,13 +176,15 @@ export default function BookingsPage() {
     setErrors({});
   };
 
-  const getRoomName = (roomId: {_id: string, roomNumber: string} | string) => {
-    const room = rooms.find(r => r._id === (roomId?._id || roomId));
+  const getRoomName = (roomId: {_id?: string, roomNumber?: string} | string) => {
+    const resolvedId = typeof roomId === 'string' ? roomId : roomId?._id;
+    const room = rooms.find(r => r._id === resolvedId);
     return room ? room.roomNumber : 'Unknown Room';
   };
 
-  const getCustomerName = (customerId: {_id: string, name: string} | string) => {
-    const customer = customers.find(c => c._id === (customerId?._id || customerId));
+  const getCustomerName = (customerId: {_id?: string, name?: string} | string) => {
+    const resolvedId = typeof customerId === 'string' ? customerId : customerId?._id;
+    const customer = customers.find(c => c._id === resolvedId);
     return customer ? customer.name : 'Unknown Customer';
   };
 
@@ -182,12 +205,12 @@ export default function BookingsPage() {
     {
       key: 'roomId',
       header: 'Room',
-      render: (booking: IBooking) => getRoomName(booking.roomId),
+      render: (booking: BookingUI) => getRoomName(booking.roomId as any),
     },
     {
       key: 'customerId',
       header: 'Customer',
-      render: (booking: IBooking) => getCustomerName(booking.customerId),
+      render: (booking: BookingUI) => getCustomerName(booking.customerId as any),
     },
     {
       key: 'startTime',
@@ -200,7 +223,7 @@ export default function BookingsPage() {
     {
       key: 'status',
       header: 'Status',
-      render: (booking: IBooking) => (
+      render: (booking: BookingUI) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
           {booking.status}
         </span>

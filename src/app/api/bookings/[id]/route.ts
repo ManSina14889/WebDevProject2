@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
+import mongoose from 'mongoose';
 
 // GET /api/bookings/[id] - Get a specific booking
 export async function GET(
@@ -41,9 +42,17 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     
+    const update: Record<string, unknown> = { ...body };
+    if (body.roomId) {
+      try { update.roomId = new mongoose.Types.ObjectId(body.roomId); } catch { /* ignore invalid, will 500 below */ }
+    }
+    if (body.customerId) {
+      try { update.customerId = new mongoose.Types.ObjectId(body.customerId); } catch { /* ignore */ }
+    }
+
     const booking = await Booking.findByIdAndUpdate(
       id,
-      body,
+      update,
       { new: true }
     )
       .populate('roomId', 'roomNumber capacity')

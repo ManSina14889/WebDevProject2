@@ -16,16 +16,38 @@ import { getApiUrl, getRouterUrl } from '@/lib/utils';
 // Removed mock data - using real data from API
 import { format } from 'date-fns';
 
+type RoomUI = {_id: string, roomNumber: string, capacity: number, status: string};
+type CustomerUI = {_id: string, name: string, phone: string, email: string};
+type BookingUI = {
+  _id: string,
+  customerId: string | CustomerUI,
+  roomId: string | RoomUI,
+  date: string,
+  startTime: string,
+  endTime: string,
+  status: string
+};
+
+const resolveId = (ref: unknown): string => {
+  if (!ref) return '';
+  if (typeof ref === 'string') return ref;
+  if (typeof ref === 'object' && ref !== null && '_id' in (ref as Record<string, unknown>)) {
+    const maybeId = (ref as Record<string, unknown>)['_id'];
+    return typeof maybeId === 'string' ? maybeId : '';
+  }
+  return '';
+};
+
 export default function UserDashboard() {
   const [user, setUser] = useState<{_id: string, name: string, email: string, role: string} | null>(null);
-  const [rooms, setRooms] = useState<{_id: string, roomNumber: string, capacity: number, status: string}[]>([]);
-  const [bookings, setBookings] = useState<{_id: string, customerId: {_id: string, name: string, phone: string, email: string}, roomId: {_id: string, roomNumber: string, capacity: number, status: string}, date: string, startTime: string, endTime: string, status: string}[]>([]);
+  const [rooms, setRooms] = useState<RoomUI[]>([]);
+  const [bookings, setBookings] = useState<BookingUI[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState<{_id: string, roomNumber: string, capacity: number, status: string} | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<RoomUI | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [dateBookings, setDateBookings] = useState<{_id: string, customerId: {_id: string, name: string, phone: string, email: string}, roomId: {_id: string, roomNumber: string, capacity: number, status: string}, date: string, startTime: string, endTime: string, status: string}[]>([]);
+  const [dateBookings, setDateBookings] = useState<BookingUI[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -34,7 +56,13 @@ export default function UserDashboard() {
       router.push(getRouterUrl('/login'));
       return;
     }
-    setUser(currentUser);
+    const normalizedUser = {
+      _id: (currentUser as any)._id ?? (currentUser as any).id ?? '',
+      name: (currentUser as any).name ?? '',
+      email: (currentUser as any).email ?? '',
+      role: (currentUser as any).role ?? 'user',
+    };
+    setUser(normalizedUser);
     console.log('Current user:', currentUser);
     fetchData();
     fetchAllBookings(); // Also fetch all bookings for My Bookings section
@@ -100,7 +128,7 @@ export default function UserDashboard() {
     router.push('/login');
   };
 
-  const handleRoomClick = (room: {_id: string, roomNumber: string, capacity: number, status: string}) => {
+  const handleRoomClick = (room: RoomUI) => {
     setSelectedRoom(room);
     setSelectedTimeSlot(null);
     setIsBookingModalOpen(true);
@@ -112,8 +140,8 @@ export default function UserDashboard() {
 
   const getUserBookings = () => {
     const userBookings = bookings.filter(booking => {
-      const customerId = booking.customerId?._id || booking.customerId?.id || booking.customerId;
-      const userId = user?._id || user?.id;
+      const customerId = resolveId(booking.customerId as unknown);
+      const userId = user?._id ?? '';
       console.log('Booking customerId:', customerId, 'User ID:', userId, 'Match:', customerId === userId);
       return customerId === userId && booking.status !== 'cancelled';
     });
@@ -139,7 +167,7 @@ export default function UserDashboard() {
 
   const getBookedTimeSlots = () => {
     const roomBookings = dateBookings.filter(booking => 
-      (booking.roomId?._id === selectedRoom?._id || booking.roomId === selectedRoom?._id) &&
+      resolveId(booking.roomId as unknown) === selectedRoom?._id &&
       booking.status === 'booked'
     );
     
@@ -158,6 +186,10 @@ export default function UserDashboard() {
     }
     
     try {
+      if (!selectedRoom || !user) {
+        alert('Please select a room and ensure you are logged in.');
+        return;
+      }
       const timeSlot = generateTimeSlots().find(slot => slot.id === selectedTimeSlot);
       if (!timeSlot) {
         alert('Invalid time slot selected');
@@ -166,7 +198,7 @@ export default function UserDashboard() {
 
       const bookingData = {
         roomId: selectedRoom._id,
-        customerId: user._id || user.id, // Handle both _id and id
+        customerId: user._id,
         date: selectedDate,
         startTime: timeSlot.startTime,
         endTime: timeSlot.endTime,
@@ -201,9 +233,10 @@ export default function UserDashboard() {
       setSelectedRoom(null);
       setSelectedTimeSlot(null);
       alert('Room booked successfully!');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating booking:', error);
-      alert('Failed to create booking: ' + error.message);
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      alert('Failed to create booking: ' + msg);
     }
   };
 
@@ -347,7 +380,9 @@ export default function UserDashboard() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">
-                            {booking.roomId?.roomNumber || 'Room ' + booking.roomId}
+                            {typeof booking.roomId === 'string' 
+                              ? 'Room ' + booking.roomId 
+                              : booking.roomId?.roomNumber}
                           </p>
                           <p className="text-sm text-gray-500">
                             {format(new Date(booking.date), 'MMM dd, yyyy')} • {booking.startTime} - {booking.endTime}
