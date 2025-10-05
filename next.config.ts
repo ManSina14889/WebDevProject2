@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  basePath: '/app/karaoke-management',
-  assetPrefix: '/app/karaoke-management',
+  basePath: '/app/WebDevProject2',
+  assetPrefix: '/app/WebDevProject2',
   /* config options here */
 };
 
