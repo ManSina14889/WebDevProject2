@@ -1,7 +1,10 @@
 # Karaoke Management System
 
 ## Team Members
-- [Anuson 6610789](https://github.com/ManSina14889)
+- [Anuson Khwansakun 6610789](https://github.com/ManSina14889)
+- [Tihong Chhiv 6632088](https://github.com/TihongChhiv)
+- Amru Al-Wafai 6630048 
+
 
 ## Project Description
 
