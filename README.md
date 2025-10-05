@@ -103,8 +103,8 @@ karaoke-management/
 - Key fields: id, roomId, customerId, date, startTime, endTime, status ('booked' | 'completed' | 'cancelled')
 - CRUD: Create booking, list/get bookings (with filters), update status/times, delete booking
 
-- we did say our Data Models were gonna be User/Admins/Booking before however user and admin kinda fall under the same category
-- If ajarn is okay with the previous Data Models then we go with that but if not then we can use the given Data Model :) :)
+ we did say our Data Models were gonna be User/Admins/Booking before however user and admin kinda fall under the same category
+ If ajarn is okay with the previous Data Models then we go with that but if not then we can use the given Data Model :) :)
 
 ### Contributing
 This project was developed as part of a web development course assignment. The system demonstrates full-stack development capabilities with modern web technologies.
